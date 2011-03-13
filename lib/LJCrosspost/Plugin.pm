@@ -167,5 +167,193 @@ sub entry_pre_save {
     return 1;
 }
 
+#############################################################
+=head3 build_file_filter
+
+This is where the magic happens.
+
+=cut
+
+sub publish {
+    my ($cb, %args) = @_;
+
+    return 1 unless ($args{ArchiveType} eq 'Individual');
+
+    my $entry = $args{Entry};
+
+    return 1 unless $entry->lj_crosspost;
+
+    my $blog = $args{Blog};
+
+    # This might lead to surprises, since I think this is the original author (arguably a feature)
+    my $author = $entry->author;
+
+    my $prefs = LJCrosspost::Prefs->byBlogOrAuthor($blog, $author);
+
+    #open WTF, ">/tmp/xpost.wtf." . $entry->id;
+    #use Data::Dumper;
+    #print WTF Dumper $prefs;
+
+    # They need to be able to turn it off
+    return 1 if (!$prefs->crosspost
+        || !($prefs->username && $prefs->password && $prefs->server));
+
+    return 1 if ($entry->lj_crosspost_date >= $entry->modified_on);
+
+    my ($xmlrpc, @challenge);
+
+    eval {
+        local $SIG{__DIE__} = undef;
+        local $SIG{__WARN__} = undef;
+        ($xmlrpc, @challenge) = _getRPCchallenge($prefs);
+    };
+
+    return $cb->error($@) if ($@);
+
+    my $plugin = MT::Plugin::LJCrosspost->instance;
+    my $tmpl = $plugin->load_tmpl('crosspost.tmpl');
+    my $ctx = $args{context};
+    my $html = $tmpl->build( $ctx );
+
+    return $cb->error($tmpl->errstr) unless defined $html;
+    $html =~ s/^\s+//;
+    $html =~ s/\s+$//;
+
+    $html = decode_utf8($html);
+
+    my $security = $entry->lj_security || $prefs->security || 'public';
+
+    my @security;
+    if ($security eq 'friends') {
+        @security = ( security => 'usemask', allowmask => 1);
+    } elsif ( $security =~ s/^custom:(\d+)$/custom/ ) {
+        @security = ( security => 'usemask', allowmask => $1);
+    } else {
+        @security = ( security => $security);
+    }
+
+    my ($year, $month, $day, $hour, $minute)
+	= $entry->authored_on =~ /^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})/;
+
+    my $props = {opt_preformatted => 1};
+
+    my %optMap = (
+        location           => 'current_location',
+        music              => 'current_music',
+        picture_keyword    => 'picture_keyword',
+        mood_id            => 'current_moodid',
+        mood               => 'current_mood',
+        lj_backdate        => 'opt_backdated',
+        # <sigh> negative options
+        lj_comments        => '!opt_nocomments',
+        lj_comments_email  => '!opt_noemail',
+        lj_comments_screen => 'opt_screening',
+    );
+
+    foreach my $k (keys %optMap) {
+        my $value = $entry->$k;
+        next unless defined $value && $value !~ /^\s*$/;;
+        my $opt = $optMap{$k};
+        $value = !$value if ($opt =~ s/^!//);
+        $props->{$opt} = decode_utf8($value) if $value;
+    }
+
+    $props->{taglist} = join ', ', $prefs->tags, $entry->tags;
+
+    my %post = (
+        @challenge,
+        @security,
+        subject => $entry->title,
+
+        year    => $year,
+        mon     => $month,
+        day     => $day,
+        hour    => $hour,
+        min     => $minute,
+
+        event   => $html || q{Where'd the text go?},
+
+        props   => $props,
+    );
+
+
+    my $method;
+    my $itemid = $entry->lj_id;
+    if ($itemid) {
+        $method = "editevent";
+        $post{itemid} = $itemid;
+    } else {
+        $method = 'postevent';
+    }
+
+    my $res;
+
+    # The redirect is obscuring the errors --aigh, it's trapping the die, too
+    eval {
+        local $SIG{__DIE__} = undef;
+        local $SIG{__WARN__} = undef;
+        $res = $xmlrpc->call("LJ.XMLRPC.$method", \%post);
+    };
+
+    return $cb->error("LJ ERROR: $@") if ($@);
+
+    if ($res->fault) {
+        return $cb->error("LJ XMLRPC ERROR: [" . $res->faultcode . "] "
+            . $res->faultstring);
+    }
+
+    #unless ($itemid && $entry->lj_anum) {
+        my $result = $res->result;
+        $entry->lj_id($result->{itemid});
+        $entry->lj_anum($result->{anum});
+
+        require MT::Util;
+        my @ts = MT::Util::offset_time_list(time, $blog->id);
+        # No function for this??
+        my $ts = sprintf '%04d%02d%02d%02d%02d%02d',
+        $ts[5]+1900, $ts[4]+1, @ts[3,2,1,0];
+
+        $entry->lj_crosspost_date($ts);
+
+        $entry->save;
+    #}
+
+    return 1;
+}
+
+sub _getRPCchallenge {
+    my $prefs = shift;
+    my $server = $prefs->server;
+    my $username = $prefs->username;
+    my $password = $prefs->password;
+
+    $server =~ s{/$}{};
+
+    require XMLRPC::Lite;
+    my $xmlrpc = new XMLRPC::Lite;
+    #$xmlrpc->outputxml(1);
+
+    $xmlrpc->proxy("$server/interface/xmlrpc");
+
+    my $res = $xmlrpc->call('LJ.XMLRPC.getchallenge');
+    die "XMLRPC error: [" . $res->faultcode . "] " . $res->faultstring
+        if ($res->fault);
+
+    my $result = $res->result;
+
+    my $challenge = $result->{challenge};
+
+    require Digest::MD5;
+    # Password is already MD5 hex
+    my $response = Digest::MD5::md5_hex($challenge . $password);
+
+    return ($xmlrpc,
+        ver            => 1,
+        auth_method    => 'challenge',
+        username       => $username,
+        auth_challenge => $challenge,
+        auth_response  => $response,
+    );
+}
 
 1;

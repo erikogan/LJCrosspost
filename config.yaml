@@ -41,3 +41,4 @@ object_types:
 callbacks:
   MT::Entry::pre_save: $LJCrosspost::LJCrosspost::Plugin::entry_pre_save
   MT::Author::pre_save: $LJCrosspost::LJCrosspost::Plugin::author_pre_save
+  build_file_filter: $LJCrosspost::LJCrosspost::Plugin::publish
