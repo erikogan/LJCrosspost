@@ -14,4 +14,6 @@ tags:
   block:
     'IfLJcrossposted?': $LJCrosspost::LJCrosspost::Plugin::if_crossposted
     LJCut: $LJCrosspost::LJCrosspost::Plugin::ljcut
-
+callbacks:
+  MT::Entry::pre_save: $LJCrosspost::LJCrosspost::Plugin::entry_pre_save
+  MT::Author::pre_save: $LJCrosspost::LJCrosspost::Plugin::author_pre_save

@@ -98,5 +98,74 @@ sub ljcut {
         . "</lj:cut>";
 }
 
+#############################################################
+=head2 Event Handlers
+
+=head3 MT::Author::pre_save
+
+Check and transform the LJ password before saving the Author
+
+=cut
+
+sub author_pre_save {
+    my ($cb, $app, $obj) = @_;
+
+    # I probably should be poking around in here
+    my $q        = $app->{query};
+
+    my $password = $q->param('lj_pass');
+    my $verify   = $q->param('lj_pass_verify');
+
+    if (($password || $verify) && $password ne $verify) {
+        return $cb->error("The LiveJournal passwords don't match.");
+    }
+
+    if ($password) {
+        require Digest::MD5;
+        $obj->lj_password(Digest::MD5::md5_hex($password));
+    }
+}
+
+#############################################################
+=head3 MT::Entry::pre_save
+
+Transform the LJ custom bitmask before saving the Author
+
+=cut
+
+sub entry_pre_save {
+    my ($cb, $app, $obj) = @_;
+
+    # I probably should be poking around in here
+    my $q = $app->{query};
+
+    my $security = $obj->lj_security;
+
+    if ($security eq 'custom') {
+        my $bitmask = 0;
+        my $params = $q->Vars;
+        foreach my $k (grep /^custom_sec_\d+$/, keys %$params) {
+            $k =~ /^custom_sec_(\d+)$/;
+            $bitmask |= (1 << $1) if $params->{"custom_sec_$1"}; # should always be, but test it
+        }
+        $obj->lj_security("$security:$bitmask");
+    }
+
+    my $comments = $q->param('lj_comments');
+
+    if ($comments eq 'on') {
+        $obj->lj_comments(1);
+        $obj->lj_comments_email(1);
+    } elsif ($comments eq 'no_email') {
+        $obj->lj_comments(1);
+        $obj->lj_comments_email(0);
+    } else {
+        $obj->lj_comments(0);
+        $obj->lj_comments_email(0);
+    }
+
+    return 1;
+}
+
 
 1;
