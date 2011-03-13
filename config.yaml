@@ -4,9 +4,12 @@ author_link: http://stealthymonkeys.com/
 author_name: Stealthy Monkeys Consulting
 description: A simple plugin to crosspost entries to LiveJournal (with metadata)
 version: 0.0.1
+schema_version: 12
+
 config_settings:
   Server:
     default: http://www.livejournal.com/
+
 tags:
   function:
     LJCrosspostURL: $LJCrosspost::LJCrosspost::Plugin::url
@@ -14,6 +17,27 @@ tags:
   block:
     'IfLJcrossposted?': $LJCrosspost::LJCrosspost::Plugin::if_crossposted
     LJCut: $LJCrosspost::LJCrosspost::Plugin::ljcut
+
+object_types:
+  entry:
+    location: 'string(255)'
+    music: 'string(255)'
+    picture_keyword: 'string(255)'
+    mood_id: 'integer'
+    mood: 'string(255)'
+    lj_cut_text: 'string(255)'
+    lj_security: 'string(255)'
+    lj_crosspost: 'boolean'
+    lj_id: 'integer'
+    lj_anum: 'integer'
+    lj_backdate: 'boolean'
+    lj_comments: 'boolean default 1'
+    lj_comments_email: 'boolean default 1'
+    # <sigh>
+    #lj_comments_screen: 'char(1)'
+    lj_comments_screen: "string(1) default 'N'"
+    lj_crosspost_date: 'datetime'
+
 callbacks:
   MT::Entry::pre_save: $LJCrosspost::LJCrosspost::Plugin::entry_pre_save
   MT::Author::pre_save: $LJCrosspost::LJCrosspost::Plugin::author_pre_save
