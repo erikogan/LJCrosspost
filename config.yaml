@@ -1,0 +1,6 @@
+name: "LiveJournal Crossposting, Reborn!"
+id: LJCrosspost2
+author_link: http://stealthymonkeys.com/
+author_name: Stealthy Monkeys Consulting
+description: A simple plugin to crosspost entries to LiveJournal (with metadata)
+version: 0.0.1
