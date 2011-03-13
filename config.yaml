@@ -39,6 +39,8 @@ object_types:
     lj_crosspost_date: 'datetime'
 
 callbacks:
+  MT::App::CMS::template_source.edit_entry: $LJCrosspost::LJCrosspost::Plugin::entry_source
+  MT::App::CMS::template_param.edit_entry: $LJCrosspost::LJCrosspost::Plugin::entry_param
   MT::Entry::pre_save: $LJCrosspost::LJCrosspost::Plugin::entry_pre_save
   MT::Author::pre_save: $LJCrosspost::LJCrosspost::Plugin::author_pre_save
   build_file_filter: $LJCrosspost::LJCrosspost::Plugin::publish

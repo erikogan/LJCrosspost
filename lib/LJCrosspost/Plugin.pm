@@ -100,7 +100,117 @@ sub ljcut {
 
 #############################################################
 =head2 Event Handlers
+=cut
 
+#############################################################
+=head3 MT::App::CMS::template_source.edit_entry
+
+Hack the edit_entry template to add LJ metadata & options
+
+=cut
+
+sub entry_source {
+    my ($cb, $app, $tmpl) = @_;
+    #my $plugin = $cb->plugin;
+
+    my $tmplDir = '../../plugins/LJCrosspost/tmpl';
+
+    # Using included templates is slightly less kludgy
+
+    $$tmpl =~ s{^(\s+?)<mtapp:setting\n(\s+?)id="keywords".*?</mtapp:setting>\n}
+	{$&\n$1<mt:if name=lj_crossposting_on><mt:include name="$tmplDir/entry_metadata.tmpl"/></mt:if>\n}sm;
+
+    $$tmpl =~ s{^(\s+?)<mtapp:setting\n(\s+?)id="basename".*?</mtapp:setting>\n}
+	{$&\n$1<mt:if name=lj_crossposting_on><mt:include name="$tmplDir/entry_publishing.tmpl"/></mt:if>\n}sm;
+}
+
+#############################################################
+=head3 MT::App::CMS::template_param.edit_entry
+
+Populate the edit_entry template with values from LJCrosspost::Prefs as
+well as data from LJ (lists of friend groups, moods, etc)
+
+=cut
+sub entry_param {
+    my ($cb, $app, $param, $tmpl) = @_;
+
+    return  unless $param->{object_type} eq 'entry';
+
+    my $plugin = $cb->plugin;
+
+    my $prefs = LJCrosspost::Prefs->byBlogOrAuthor( $param->{blog_id},
+                                                    $param->{author_id} );
+
+
+    if ( $prefs->crosspost && $prefs->server
+         && $prefs->username && $prefs->password) {
+        my $xmlrpc;
+
+        my $login;
+        eval {
+            local $SIG{__DIE__} = undef;
+            local $SIG{__WARN__} = undef;
+            ($xmlrpc, my @challenge) = _getRPCchallenge($prefs);
+
+            $login = $xmlrpc->call('LJ.XMLRPC.login',
+                {
+                    @challenge,
+                    getmoods      => 0,
+                    getpickws     => 1,
+                    getpickwurls  => 1,
+                    clientversion => $clientversion,
+                }
+            );
+        };
+
+        unless ($@) {
+            my $result = $login->result;
+            # They come back in id order, which isn't alphabetical
+            $param->{moods}
+            = [ sort { $a->{name} cmp $b->{name} }
+            @{$result->{moods}} ];
+            $param->{lj_username} = $prefs->username;
+
+            my %pics;
+
+            for (my $i = 0 ; $i < @{$result->{pickws}} ; $i++) {
+                $pics{$result->{pickws}[$i]} = $result->{pickwurls}[$i];
+            }
+
+            $param->{lj_userpics} = [ map { { keyword => $_, url => $pics{$_} } }
+            sort keys %pics];
+            $param->{lj_friendgroups} = $result->{friendgroups};
+
+            $param->{lj_security} = $prefs->security
+            unless exists $param->{lj_security} && defined $param->{lj_security};
+
+            if ($param->{lj_security} =~ s/(custom):(\d+)/$1/) {
+                my $bits = $2;
+
+                for (my $i = 1 ; $i < 32 ; $i++) {
+                    $param->{"custom_sec_$i"}++
+                    if ($bits & (1 << $i));
+                }
+            }
+
+            $param->{"lj_security_$param->{lj_security}"}++;
+        }
+
+        $param->{lj_crossposting_on} = $prefs->crosspost;
+        $param->{lj_crosspost} = $prefs->crosspost_entry
+            unless defined $param->{lj_crosspost};
+
+        foreach my $default (qw {location music picture_keyword mood_id
+                                 mood comments comments_email
+                                 comments_screen}) {
+            $param->{$default} = $prefs->$default
+            unless exists $param->{$default};
+        }
+    }
+}
+
+
+#############################################################
 =head3 MT::Author::pre_save
 
 Check and transform the LJ password before saving the Author
