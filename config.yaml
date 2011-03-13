@@ -11,4 +11,7 @@ tags:
   function:
     LJCrosspostURL: $LJCrosspost::LJCrosspost::Plugin::url
     LJCrosspostLink: $LJCrosspost::LJCrosspost::Plugin::link
+  block:
+    'IfLJcrossposted?': $LJCrosspost::LJCrosspost::Plugin::if_crossposted
+    LJCut: $LJCrosspost::LJCrosspost::Plugin::ljcut
 
