@@ -54,7 +54,7 @@ entry
 sub link {
     my ($ctx, $args, $cond) = @_;
 
-    my $plugin = MT::Plugin::LJCrosspost->instance;
+    my $plugin = MT->component('LJCrosspost');
     my $tmpl = $plugin->load_tmpl('link.tmpl');
 
     my $text = $args->{text} || 'Crossposted';
@@ -343,7 +343,7 @@ sub publish {
 
     return $cb->error($@) if ($@);
 
-    my $plugin = MT::Plugin::LJCrosspost->instance;
+    my $plugin = $cb->plugin;
     my $tmpl = $plugin->load_tmpl('crosspost.tmpl');
     my $ctx = $args{context};
     my $html = $tmpl->build( $ctx );
