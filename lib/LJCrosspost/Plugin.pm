@@ -352,7 +352,8 @@ sub publish {
     $html =~ s/^\s+//;
     $html =~ s/\s+$//;
 
-    $html = decode_utf8($html);
+    # I think we've finally gotten to where UTF-8 is ubiquitous
+    # $html = decode_utf8($html);
 
     my $security = $entry->lj_security || $prefs->security || 'public';
 
@@ -388,7 +389,9 @@ sub publish {
         next unless defined $value && $value !~ /^\s*$/;;
         my $opt = $optMap{$k};
         $value = !$value if ($opt =~ s/^!//);
-        $props->{$opt} = decode_utf8($value) if $value;
+        # I think we've finally gotten to where UTF-8 is ubiquitous
+        # $props->{$opt} = decode_utf8($value) if $value;
+        $props->{$opt} = $value if $value;
     }
 
     $props->{taglist} = join ', ', $prefs->tags, $entry->tags;
