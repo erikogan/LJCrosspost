@@ -8,8 +8,8 @@
   help_section="location">
   <div class="textarea-wrapper">
     <input type="text" class="full-width" tabindex="9"
-	name="location" id="location"
-	value="<$mt:var name="location" escape="html"$>" />
+        name="location" id="location"
+        value="<$mt:var name="location" escape="html"$>" />
   </div>
 </mtapp:setting>
 
@@ -21,8 +21,8 @@
   help_section="music">
   <div class="textarea-wrapper">
     <input type="text" class="full-width" tabindex="10"
-	name="music" id="music"
-	value="<$mt:var name="music" escape="html"$>" />
+        name="music" id="music"
+        value="<$mt:var name="music" escape="html"$>" />
   </div>
 </mtapp:setting>
 
@@ -36,9 +36,9 @@
     <option value="0">None or Other:</option>
     <MTLOOP NAME=moods>
       <option value="<MTVAR NAME=id>"
-	<MTIF NAME=mood_id EQ="$id">
-	  selected="selected"
-	</MTIF>
+        <MTIF NAME=mood_id EQ="$id">
+          selected="selected"
+        </MTIF>
       ><MTVAR NAME=name></option>
     </MTLOOP>
   </select>
@@ -58,9 +58,9 @@
     <option value="">(default)</option>
     <MTLOOP NAME=lj_userpics>
       <option value="<MTVAR NAME=keyword>"
-	<MTIF NAME=picture_keyword EQ="$keyword">
-	  selected="selected"
-	</MTIF>
+        <MTIF NAME=picture_keyword EQ="$keyword">
+          selected="selected"
+        </MTIF>
       ><MTVAR NAME=keyword></option>
     </MTLOOP>
   </select>

@@ -25,7 +25,7 @@
     <div>
       <MTLOOP name="lj_friendgroups"><mt:setvarblock name="inputName">custom_sec_<mt:var name="id"/></mt:setvarblock>
 
-	<input type="checkbox" name="<mt:var name=inputName>" value="1" <TMPL_IF NAME="$inputName">checked="checked"</TMPL_IF> /><label for="<mt:var name=inputName>"><TMPL_VAR NAME=name /></label></MTLOOP>
+        <input type="checkbox" name="<mt:var name=inputName>" value="1" <TMPL_IF NAME="$inputName">checked="checked"</TMPL_IF> /><label for="<mt:var name=inputName>"><TMPL_VAR NAME=name /></label></MTLOOP>
     </div>
 </mtapp:setting>
 

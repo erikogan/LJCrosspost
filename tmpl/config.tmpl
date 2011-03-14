@@ -48,7 +48,7 @@
   <mtapp:setting
     id="lj_login"
     label="<__trans phrase="Password">">
-    
+
     <ul>
       <li><input type="password" name="lj_pass" id="lj_pass" value="" /></li>
     </ul>
@@ -72,18 +72,18 @@
       <li><input type="radio" name="lj_crosspost_default" id="lj_crosspost_default_no" value="0"<TMPL_UNLESS NAME=LJ_CROSSPOST_DEFAULT>checked="checked" </TMPL_UNLESS>/><label for="lj_crosspost_default_no"><em>Don't</em> Crosspost</label></li>
     </ul>
   </mtapp:setting>
-  
+
 
   <p>
     <a href="javascript:void(0)" onclick="return toggleAdvancedPrefs(event,'ljcrosspost')"><MT_TRANS phrase="Advanced Settings"></a>
   </p>
-  
+
   <span id="ljcrosspost-advanced" class="setting-advanced">
     <mtapp:setting
       id="lj_server"
       label="<__trans phrase="Server">">
       <ul>
-	<li><input type="text" name="lj_server" id="lj_server_input" value="<TMPL_VAR NAME=LJ_SERVER ESCAPE=HTML>" /></li>
+        <li><input type="text" name="lj_server" id="lj_server_input" value="<TMPL_VAR NAME=LJ_SERVER ESCAPE=HTML>" /></li>
       </ul>
     </mtapp:setting>
   </span>
