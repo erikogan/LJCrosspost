@@ -169,10 +169,15 @@ sub entry_param {
 
         unless ($@) {
             my $result = $login->result;
+
+            unless($result) {
+                MT->error("XML-RPC error: $!");
+            }
+
             # They come back in id order, which isn't alphabetical
             $param->{moods}
-            = [ sort { $a->{name} cmp $b->{name} }
-            @{$result->{moods}} ];
+                = [ sort { $a->{name} cmp $b->{name} }
+                    @{$result->{moods}} ];
             $param->{lj_username} = $prefs->username;
 
             my %pics;
@@ -182,11 +187,11 @@ sub entry_param {
             }
 
             $param->{lj_userpics} = [ map { { keyword => $_, url => $pics{$_} } }
-            sort keys %pics];
+                                        sort keys %pics];
             $param->{lj_friendgroups} = $result->{friendgroups};
 
             $param->{lj_security} = $prefs->security
-            unless exists $param->{lj_security} && defined $param->{lj_security};
+                unless exists $param->{lj_security} && defined $param->{lj_security};
 
             if ($param->{lj_security} =~ s/(custom):(\d+)/$1/) {
                 my $bits = $2;
@@ -211,6 +216,7 @@ sub entry_param {
             unless exists $param->{$default};
         }
     }
+    $param;
 }
 
 
