@@ -1,0 +1,92 @@
+<mt:setvarblock name="content_header" id="content_header">
+<mt:if name="saved">
+    <mtapp:statusmsg
+        id="saved"
+        class="success">
+        <__trans phrase="This profile has been updated.">
+    </mtapp:statusmsg>
+</mt:if>
+<mt:if name="error">
+    <mtapp:statusmsg
+        id="generic-error"
+        class="error">
+        <mt:var name="error">
+    </mtapp:statusmsg>
+</mt:if>
+</mt:setvarblock>
+<mt:include name="include/header.tmpl">
+
+<form name="crossposting" id="crossposting" method="post" action="<mt:var name="script_url">">
+  <input type="hidden" name="__mode" value="save" />
+  <input type="hidden" name="_type" value="author" />
+  <mt:if name="blog_id">
+    <input type="hidden" name="blog_id" value="<mt:var name="blog_id">" />
+  </mt:if>
+  <mt:if name="author_id">
+    <input type="hidden" name="author_id" value="<mt:var name="author_id">" />
+  </mt:if>
+
+  <mtapp:setting
+    id="lj_crosspost"
+    label="<__trans phrase="Enable Crossposting">">
+
+    <ul>
+      <li><input type="radio" name="lj_crosspost" id="lj_crosspost_yes" value="1" <TMPL_IF NAME=LJ_CROSSPOST>checked="checked" </TMPL_IF>/><label for="lj_crosspost_yes">Yes</label></li>
+      <li><input type="radio" name="lj_crosspost" id="lj_crosspost_no" value="0"<TMPL_UNLESS NAME=LJ_CROSSPOST>checked="checked" </TMPL_UNLESS>/><label for="lj_crosspost_no">No</label></li>
+    </ul>
+  </mtapp:setting>
+
+  <mtapp:setting
+    id="lj_login"
+    label="<__trans phrase="Username">">
+
+    <ul>
+      <li><input type="text" name="lj_username" id="lj_username" value="<TMPL_VAR NAME=LJ_USERNAME ESCAPE=HTML>" /></li>
+    </ul>
+  </mtapp:setting>
+
+  <mtapp:setting
+    id="lj_login"
+    label="<__trans phrase="Password">">
+    
+    <ul>
+      <li><input type="password" name="lj_pass" id="lj_pass" value="" /></li>
+    </ul>
+  </mtapp:setting>
+
+  </mtapp:setting>
+
+  <mtapp:setting
+    id="lj_verify"
+    label="<__trans phrase="Again">">
+    <ul>
+      <li><input type="password" name="lj_pass_verify" id="lj_pass_verify" value="" /></li>
+    </ul>
+  </mtapp:setting>
+
+  <mtapp:setting
+    id="lj_cross"
+    label="<__trans phrase="Entry Default">">
+    <ul>
+      <li><input type="radio" name="lj_crosspost_default" id="lj_crosspost_default_yes" value="1" <TMPL_IF NAME=LJ_CROSSPOST_DEFAULT>checked="checked" </TMPL_IF>/><label for="lj_crosspost_default_yes">Crosspost</label></li>
+      <li><input type="radio" name="lj_crosspost_default" id="lj_crosspost_default_no" value="0"<TMPL_UNLESS NAME=LJ_CROSSPOST_DEFAULT>checked="checked" </TMPL_UNLESS>/><label for="lj_crosspost_default_no"><em>Don't</em> Crosspost</label></li>
+    </ul>
+  </mtapp:setting>
+  
+
+  <p>
+    <a href="javascript:void(0)" onclick="return toggleAdvancedPrefs(event,'ljcrosspost')"><MT_TRANS phrase="Advanced Settings"></a>
+  </p>
+  
+  <span id="ljcrosspost-advanced" class="setting-advanced">
+    <mtapp:setting
+      id="lj_server"
+      label="<__trans phrase="Server">">
+      <ul>
+	<li><input type="text" name="lj_server" id="lj_server_input" value="<TMPL_VAR NAME=LJ_SERVER ESCAPE=HTML>" /></li>
+      </ul>
+    </mtapp:setting>
+  </span>
+  <mt:include name="include/actions_bar.tmpl" bar_position="bottom" hide_pager="1" settings_bar="1">
+</form>
+<mt:include name="include/footer.tmpl">

@@ -1,0 +1,63 @@
+<mtapp:setting
+  id="crosspost"
+  label="<__trans phrase="Crosspost">"
+  help_page="$helpPage"
+  help_section="crosspost">
+    <input type="radio" name="lj_crosspost" id="lj_crosspost_yes" value="1" <TMPL_IF NAME=LJ_CROSSPOST> checked="checked" </TMPL_IF>/>
+    <label for="lj_crosspost_yes">Yes</label><br/>
+
+    <input type="radio" name="lj_crosspost" id="lj_crosspost_no" value="0" <TMPL_UNLESS NAME=LJ_CROSSPOST> checked="checked" </TMPL_UNLESS>/>
+    <label for="lj_crosspost_no">No</label>
+</mtapp:setting>
+
+<mtapp:setting
+  id="security"
+  label="<__trans phrase="LiveJournal Security">"
+  help_page="$helpPage"
+  help_section="security">
+    <select name="lj_security">
+      <option value="public" id='security_public' <TMPL_IF NAME=lj_security_public> selected="selected"</TMPL_IF>>Everyone (Public)</option>
+      <option value="friends" id='security_friends' <TMPL_IF NAME=lj_security_friends> selected="selected"</TMPL_IF>>Friends</option>
+      <option value="private" id='security_private' <TMPL_IF NAME=lj_security_private> selected="selected"</TMPL_IF>>Just Me (Private)</option>
+      <option value="custom" id='security_custom' <TMPL_IF NAME=lj_security_custom> selected="selected"</TMPL_IF>>Custom...</option>
+    </select>
+
+    <div>
+      <MTLOOP name="lj_friendgroups"><mt:setvarblock name="inputName">custom_sec_<mt:var name="id"/></mt:setvarblock>
+
+	<input type="checkbox" name="<mt:var name=inputName>" value="1" <TMPL_IF NAME="$inputName">checked="checked"</TMPL_IF> /><label for="<mt:var name=inputName>"><TMPL_VAR NAME=name /></label></MTLOOP>
+    </div>
+</mtapp:setting>
+
+<mtapp:setting
+  id="backdate"
+  label="<__trans phrase="Backdate">"
+  help_page="$helpPage"
+  help_section="backdate">
+    <input type="radio" name="lj_backdate" id="lj_backdate_yes" value="1" <TMPL_IF NAME=LJ_BACKDATE> checked="checked" </TMPL_IF>/>
+    <label for="lj_backdate_yes">Yes</label><br/>
+
+    <input type="radio" name="lj_backdate" id="lj_backdate_no" value="0" <TMPL_UNLESS NAME=LJ_BACKDATE> checked="checked" </TMPL_UNLESS>/>
+    <label for="lj_backdate_no">No</label>
+</mtapp:setting>
+
+<mtapp:setting
+  id="comments"
+  label="<__trans phrase="LiveJournal Comments">"
+  help_page="$helpPage"
+  help_section="comments">
+    <select name="lj_comments">
+      <option value="on" id='comments_public' <TMPL_IF NAME=lj_comments_on> selected="selected"</TMPL_IF>>On</option>
+      <option value="no_email" id='comments_friends' <TMPL_IF NAME=lj_comments_noemail> selected="selected"</TMPL_IF>>On, no Email</option>
+      <option value="off" id='comments_private' <TMPL_IF NAME=lj_comments_off> selected="selected"</TMPL_IF>>Off</option>
+    </select> <br/>
+
+    <label for="lj_comments_screen">Screen:</label> <br/>
+
+    <select name="lj_comments_screen">
+      <option value="N" <TMPL_IF NAME=LJ_COMMENTS_SCREEN EQ=N> selected="selected"</TMPL_IF>>Disabled</option>
+      <option value="R" <TMPL_IF NAME=LJ_COMMENTS_SCREEN EQ=R> selected="selected"</TMPL_IF>>Anonymous Only</option>
+      <option value="F" <TMPL_IF NAME=LJ_COMMENTS_SCREEN EQ=F> selected="selected"</TMPL_IF>>Non-friends</option>
+      <option value="A" <TMPL_IF NAME=LJ_COMMENTS_SCREEN EQ=A> selected="selected"</TMPL_IF>>All Comments</option>
+    </select>
+</mtapp:setting>

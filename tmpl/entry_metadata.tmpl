@@ -1,0 +1,67 @@
+<mt:setvar name="helpPage" value="ljcrosspost"/>
+
+<mtapp:setting
+  id="location"
+  label="<__trans phrase="Location">"
+  label_class="top-label"
+  help_page="$helpPage"
+  help_section="location">
+  <div class="textarea-wrapper">
+    <input type="text" class="full-width" tabindex="9"
+	name="location" id="location"
+	value="<$mt:var name="location" escape="html"$>" />
+  </div>
+</mtapp:setting>
+
+<mtapp:setting
+  id="music"
+  label="<__trans phrase="Music">"
+  label_class="top-label"
+  help_page="$helpPage"
+  help_section="music">
+  <div class="textarea-wrapper">
+    <input type="text" class="full-width" tabindex="10"
+	name="music" id="music"
+	value="<$mt:var name="music" escape="html"$>" />
+  </div>
+</mtapp:setting>
+
+<mtapp:setting
+  id="mood"
+  label="<__trans phrase="Mood">"
+  label_class="top-label"
+  help_page="$helpPage"
+  help_section="mood">
+  <select name="mood_id">
+    <option value="0">None or Other:</option>
+    <MTLOOP NAME=moods>
+      <option value="<MTVAR NAME=id>"
+	<MTIF NAME=mood_id EQ="$id">
+	  selected="selected"
+	</MTIF>
+      ><MTVAR NAME=name></option>
+    </MTLOOP>
+  </select>
+  <span class="textarea-wrapper">
+  <input type="text" class="not-full-width" tabindex="10"
+    name="mood" id="mood" value="<$mt:var name="mood" escape="html"$>" />
+  </span>
+</mtapp:setting>
+
+<mtapp:setting
+  id="picture_keyword"
+  label="<__trans phrase="Picture Keyword">"
+  label_class="top-label"
+  help_page="$helpPage"
+  help_section="picture_keyword">
+  <select name="picture_keyword">
+    <option value="">(default)</option>
+    <MTLOOP NAME=lj_userpics>
+      <option value="<MTVAR NAME=keyword>"
+	<MTIF NAME=picture_keyword EQ="$keyword">
+	  selected="selected"
+	</MTIF>
+      ><MTVAR NAME=keyword></option>
+    </MTLOOP>
+  </select>
+</mtapp:setting>
