@@ -1,4 +1,4 @@
-package LJCrosspost::Prefs
+package LJCrosspost::Prefs;
 
 use strict;
 use base qw( MT::Object );
