@@ -167,43 +167,52 @@ sub entry_param {
             );
         };
 
-        unless ($@) {
-            my $result = $login->result;
-
-            unless($result) {
-                MT->error("XML-RPC error: $!");
-            }
-
-            # They come back in id order, which isn't alphabetical
-            $param->{moods}
-                = [ sort { $a->{name} cmp $b->{name} }
-                    @{$result->{moods}} ];
-            $param->{lj_username} = $prefs->username;
-
-            my %pics;
-
-            for (my $i = 0 ; $i < @{$result->{pickws}} ; $i++) {
-                $pics{$result->{pickws}[$i]} = $result->{pickwurls}[$i];
-            }
-
-            $param->{lj_userpics} = [ map { { keyword => $_, url => $pics{$_} } }
-                                        sort keys %pics];
-            $param->{lj_friendgroups} = $result->{friendgroups};
-
-            $param->{lj_security} = $prefs->security
-                unless exists $param->{lj_security} && defined $param->{lj_security};
-
-            if ($param->{lj_security} =~ s/(custom):(\d+)/$1/) {
-                my $bits = $2;
-
-                for (my $i = 1 ; $i < 32 ; $i++) {
-                    $param->{"custom_sec_$i"}++
-                    if ($bits & (1 << $i));
-                }
-            }
-
-            $param->{"lj_security_$param->{lj_security}"}++;
+        if ($@) {
+            MT->error("Livejournal Error: $@");
+            return;
         }
+
+        if ($login->fault) {
+            return MT->error("LJ XMLRPC ERROR: [" . $login->faultcode . "] "
+                . $login->faultstring);
+            return;
+        }
+
+        my $result = $login->result;
+
+        unless($result) {
+            MT->error("XML-RPC error: $!");
+        }
+
+        # They come back in id order, which isn't alphabetical
+        $param->{moods}
+            = [ sort { $a->{name} cmp $b->{name} }
+                @{$result->{moods}} ];
+        $param->{lj_username} = $prefs->username;
+
+        my %pics;
+
+        for (my $i = 0 ; $i < @{$result->{pickws}} ; $i++) {
+            $pics{$result->{pickws}[$i]} = $result->{pickwurls}[$i];
+        }
+
+        $param->{lj_userpics} = [ map { { keyword => $_, url => $pics{$_} } }
+                                    sort keys %pics];
+        $param->{lj_friendgroups} = $result->{friendgroups};
+
+        $param->{lj_security} = $prefs->security
+            unless exists $param->{lj_security} && defined $param->{lj_security};
+
+        if ($param->{lj_security} =~ s/(custom):(\d+)/$1/) {
+            my $bits = $2;
+
+            for (my $i = 1 ; $i < 32 ; $i++) {
+                $param->{"custom_sec_$i"}++
+                if ($bits & (1 << $i));
+            }
+        }
+
+        $param->{"lj_security_$param->{lj_security}"}++;
 
         $param->{lj_crossposting_on} = $prefs->crosspost;
         $param->{lj_crosspost} = $prefs->crosspost_entry
