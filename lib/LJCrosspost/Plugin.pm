@@ -10,6 +10,10 @@ use strict;
 # Upgrade!
 use MT 5;
 
+use LJCrosspost::Prefs;
+
+our $clientversion = "$^O-LJCrosspost/0.1.0.$MT::VERSION";
+
 #############################################################
 =head2 LJCrosspostURL
 
