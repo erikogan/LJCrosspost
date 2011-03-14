@@ -237,9 +237,11 @@ Check and transform the LJ password before saving the Author
 =cut
 
 sub author_pre_save {
-    my ($cb, $app, $obj) = @_;
+    my ($cb, $obj) = @_;
 
-    # I probably should be poking around in here
+    my $app = MT->app;
+
+    # I probably shouldn't be poking around in here
     my $q        = $app->{query};
 
     my $password = $q->param('lj_pass');
@@ -263,9 +265,11 @@ Transform the LJ custom bitmask before saving the Author
 =cut
 
 sub entry_pre_save {
-    my ($cb, $app, $obj) = @_;
+    my ($cb, $obj) = @_;
 
-    # I probably should be poking around in here
+    my $app = MT->app;
+
+    # I probably shouldn't be poking around in here
     my $q = $app->{query};
 
     my $security = $obj->lj_security;
