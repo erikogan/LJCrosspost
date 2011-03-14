@@ -1,6 +1,7 @@
 <mtapp:setting
   id="crosspost"
   label="<__trans phrase="Crosspost">"
+  label_class="top-label"
   help_page="$helpPage"
   help_section="crosspost">
     <input type="radio" name="lj_crosspost" id="lj_crosspost_yes" value="1" <TMPL_IF NAME=LJ_CROSSPOST> checked="checked" </TMPL_IF>/>
@@ -13,6 +14,7 @@
 <mtapp:setting
   id="security"
   label="<__trans phrase="LiveJournal Security">"
+  label_class="top-label"
   help_page="$helpPage"
   help_section="security">
     <select name="lj_security">
@@ -32,6 +34,7 @@
 <mtapp:setting
   id="backdate"
   label="<__trans phrase="Backdate">"
+  label_class="top-label"
   help_page="$helpPage"
   help_section="backdate">
     <input type="radio" name="lj_backdate" id="lj_backdate_yes" value="1" <TMPL_IF NAME=LJ_BACKDATE> checked="checked" </TMPL_IF>/>
@@ -44,6 +47,7 @@
 <mtapp:setting
   id="comments"
   label="<__trans phrase="LiveJournal Comments">"
+  label_class="top-label"
   help_page="$helpPage"
   help_section="comments">
     <select name="lj_comments">
