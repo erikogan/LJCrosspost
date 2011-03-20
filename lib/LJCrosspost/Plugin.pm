@@ -10,6 +10,7 @@ use strict;
 # Upgrade!
 use MT 5;
 
+use HTML::Entities;
 use LJCrosspost::Prefs;
 
 our $clientversion = "$^O-LJCrosspost/0.1.0.$MT::VERSION";
@@ -391,7 +392,7 @@ sub publish {
         $value = !$value if ($opt =~ s/^!//);
         # I think we've finally gotten to where UTF-8 is ubiquitous
         # $props->{$opt} = decode_utf8($value) if $value;
-        $props->{$opt} = $value if $value;
+        $props->{$opt} = encode_entities($value) if $value;
     }
 
     $props->{taglist} = join ', ', $prefs->tags, $entry->tags;
